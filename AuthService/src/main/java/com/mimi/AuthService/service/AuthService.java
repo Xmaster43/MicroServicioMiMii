@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
@@ -23,10 +24,13 @@ public class AuthService {
     private final RestTemplate restTemplate;
     private final JwtUtil jwtUtil;
 
+    @Value("${userservice.url:http://localhost:8084}")
+    private String userServiceUrl;
+
     public LoginResponse login(String email, String password) {
 
         try {
-            String url = "http://localhost:8084/api/users/validate";
+            String url = userServiceUrl + "/api/users/validate";
 
             UserAuthDTO usuario = restTemplate.postForObject(
                     url,
@@ -81,7 +85,7 @@ public class AuthService {
         try {
             String email = jwtUtil.extractEmail(token);
 
-            String url = "http://localhost:8084/api/users/by-email/" + email;
+            String url = userServiceUrl + "/api/users/by-email/" + email;
 
             UserDTO usuario = restTemplate.getForObject(url, UserDTO.class);
 
