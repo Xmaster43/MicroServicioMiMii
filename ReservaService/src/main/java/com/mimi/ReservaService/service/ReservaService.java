@@ -5,13 +5,14 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.web.client.RestClient;
 
 import com.mimi.ReservaService.dto.CrearReservaRequest;
 import com.mimi.ReservaService.dto.ReservaDetalleResponse;
 import com.mimi.ReservaService.dto.ReservaResponse;
 import com.mimi.ReservaService.dto.ServicioDTO;
 import com.mimi.ReservaService.dto.UsuarioDTO;
+import com.mimi.ReservaService.event.ReservaCreatedEvent;
 import com.mimi.ReservaService.model.Reserva;
 import com.mimi.ReservaService.repository.ReservaRepository;
 
@@ -22,7 +23,8 @@ import lombok.RequiredArgsConstructor;
 public class ReservaService {
 
     private final ReservaRepository reservaRepo;
-    private final RestTemplate rest;
+    private final RestClient restClient;
+    private final ReservaEventPublisher eventPublisher;
 
     @Value("${userservice.url:http://localhost:8084}")
     private String userServiceUrl;
@@ -40,17 +42,26 @@ public class ReservaService {
 
     public ReservaResponse crearReserva(CrearReservaRequest req) {
         // *validaciones (las de siempre)*
-        UsuarioDTO usuario = rest.getForObject(getUserUrl() + req.getIdUsuario(), UsuarioDTO.class);
+        UsuarioDTO usuario = restClient.get()
+                .uri(getUserUrl() + req.getIdUsuario())
+                .retrieve()
+                .body(UsuarioDTO.class);
         if (usuario == null)
             throw new RuntimeException("Usuario no encontrado");
 
-        UsuarioDTO trabajador = rest.getForObject(getUserUrl() + req.getIdTrabajador(), UsuarioDTO.class);
+        UsuarioDTO trabajador = restClient.get()
+                .uri(getUserUrl() + req.getIdTrabajador())
+                .retrieve()
+                .body(UsuarioDTO.class);
         if (trabajador == null)
             throw new RuntimeException("Trabajador no encontrado");
         if (trabajador.getRolId() != 3)
             throw new RuntimeException("El usuario no es trabajador válido");
 
-        ServicioDTO servicio = rest.getForObject(getServicioUrl() + req.getIdServicio(), ServicioDTO.class);
+        ServicioDTO servicio = restClient.get()
+                .uri(getServicioUrl() + req.getIdServicio())
+                .retrieve()
+                .body(ServicioDTO.class);
         if (servicio == null)
             throw new RuntimeException("Servicio no encontrado");
 
@@ -69,6 +80,16 @@ public class ReservaService {
                 .build();
 
         reservaRepo.save(nueva);
+
+        // Publicar evento asíncrono
+        ReservaCreatedEvent event = new ReservaCreatedEvent(
+                nueva.getIdReserva(),
+                nueva.getIdUsuario(),
+                nueva.getIdServicio(),
+                nueva.getFecha(),
+                nueva.getHora()
+        );
+        eventPublisher.publishReservaCreada(event);
 
         return toDTO(nueva);
     }
@@ -118,9 +139,18 @@ public class ReservaService {
 
     public ReservaDetalleResponse mapToDetalle(Reserva r) {
         // obtener datos externos
-        UsuarioDTO usuario = rest.getForObject(getUserUrl() + r.getIdUsuario(), UsuarioDTO.class);
-        UsuarioDTO trabajador = rest.getForObject(getUserUrl() + r.getIdTrabajador(), UsuarioDTO.class);
-        ServicioDTO servicio = rest.getForObject(getServicioUrl() + r.getIdServicio(), ServicioDTO.class);
+        UsuarioDTO usuario = restClient.get()
+                .uri(getUserUrl() + r.getIdUsuario())
+                .retrieve()
+                .body(UsuarioDTO.class);
+        UsuarioDTO trabajador = restClient.get()
+                .uri(getUserUrl() + r.getIdTrabajador())
+                .retrieve()
+                .body(UsuarioDTO.class);
+        ServicioDTO servicio = restClient.get()
+                .uri(getServicioUrl() + r.getIdServicio())
+                .retrieve()
+                .body(ServicioDTO.class);
 
         return new ReservaDetalleResponse(
                 r.getIdReserva(),

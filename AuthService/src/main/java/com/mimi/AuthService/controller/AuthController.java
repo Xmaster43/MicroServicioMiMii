@@ -50,7 +50,7 @@ public class AuthController {
         LoginResponse response = authService.login(request.getEmail(), request.getPassword());
 
         if (!response.isSuccess()) {
-            return ResponseEntity.badRequest().body(response);
+            return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(response);
         }
 
         if (response.getUser() == null) {

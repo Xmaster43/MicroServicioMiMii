@@ -1,5 +1,6 @@
 package com.mimi.ProductService.service;
 
+import com.mimi.ProductService.event.ReservaCreatedEvent;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -80,6 +81,12 @@ public class ProductService {
                 p.getImagen(),
                 p.getCategoria() != null ? p.getCategoria().getIdCategoria() : null
         );
+    }
+
+    public void handleReservaCreated(ReservaCreatedEvent event) {
+        // TODO: implement business logic for reservation event (e.g., update stock, notify, etc.)
+        // For now just log
+        System.out.println("Handling ReservaCreated event: " + event);
     }
 }
 

@@ -1,5 +1,6 @@
 package com.mimi.AuthService.service;
 
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import lombok.RequiredArgsConstructor;
 
 import java.util.Map;
@@ -7,7 +8,7 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.web.client.RestClient;
 
 import com.mimi.AuthService.dto.LoginRequest;
 import com.mimi.AuthService.dto.LoginResponse;
@@ -21,55 +22,47 @@ import jakarta.servlet.http.HttpServletRequest;
 @RequiredArgsConstructor
 public class AuthService {
 
-    private final RestTemplate restTemplate;
+    private final RestClient restClient;
     private final JwtUtil jwtUtil;
 
     @Value("${userservice.url:http://localhost:8084}")
     private String userServiceUrl;
 
+    @CircuitBreaker(name = "userService", fallbackMethod = "loginFallback")
     public LoginResponse login(String email, String password) {
+        String url = userServiceUrl + "/api/users/validate";
 
-        try {
-            String url = userServiceUrl + "/api/users/validate";
+        UserAuthDTO usuario = restClient.post()
+                .uri(url)
+                .body(new LoginRequest(email, password))
+                .retrieve()
+                .body(UserAuthDTO.class);
 
-            UserAuthDTO usuario = restTemplate.postForObject(
-                    url,
-                    new LoginRequest(email, password),
-                    UserAuthDTO.class);
-
-            if (usuario == null) {
-                return new LoginResponse(
-                        true,
-                        "Credenciales inválidas",
-                        null,
-                        null);
-            }
-
-            String token = jwtUtil.generateToken(
-                    usuario.getCorreo(),
-                    usuario.getRolId());
-
-            return new LoginResponse(
-                    true,
-                    "Login exitoso",
-                    usuario,
-                    token);
-
-        } catch (HttpClientErrorException.Unauthorized e) {
+        if (usuario == null) {
             return new LoginResponse(
                     true,
                     "Credenciales inválidas",
                     null,
                     null);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            return new LoginResponse(
-                    false,
-                    "Error conectando a UserService",
-                    null,
-                    null);
         }
+
+        String token = jwtUtil.generateToken(
+                usuario.getCorreo(),
+                usuario.getRolId());
+
+        return new LoginResponse(
+                true,
+                "Login exitoso",
+                usuario,
+                token);
+    }
+
+    private LoginResponse loginFallback(String email, String password, Throwable t) {
+        return new LoginResponse(
+                false,
+                "UserService no disponible",
+                null,
+                null);
     }
 
     public Object me(HttpServletRequest request) {
@@ -87,7 +80,10 @@ public class AuthService {
 
             String url = userServiceUrl + "/api/users/by-email/" + email;
 
-            UserDTO usuario = restTemplate.getForObject(url, UserDTO.class);
+            UserDTO usuario = restClient.get()
+                    .uri(url)
+                    .retrieve()
+                    .body(UserDTO.class);
 
             if (usuario == null) {
                 return Map.of("error", "Usuario no encontrado");
