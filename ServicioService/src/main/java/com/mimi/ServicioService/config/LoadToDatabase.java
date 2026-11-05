@@ -1,5 +1,6 @@
 package com.mimi.ServicioService.config;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -18,7 +19,9 @@ public class LoadToDatabase {
     @Bean
     CommandLineRunner initDatabase(
             CategoriaRepository categoriaRepo,
-            ServicioRepository servicioRepo
+            ServicioRepository servicioRepo,
+            @Value("${app.images.base-url:http://localhost:8083}") 
+            String imagesBaseUrl
     ) {
         return args -> {
 
@@ -67,7 +70,7 @@ public class LoadToDatabase {
                     .descripcion("Brushing profesional con ondas definidas.")
                     .precio(19990)
                     .categoria(peinados)
-                    .imagenUrl("http://localhost:8083/servicios/brushing%20ondas.jpg")
+                    .imagenUrl(imagesBaseUrl + "/servicios/brushing%20ondas.jpg")
                     .build()
             );
 
@@ -76,7 +79,7 @@ public class LoadToDatabase {
                     .descripcion("Brushing con terminación a plancha.")
                     .precio(17990)
                     .categoria(peinados)
-                    .imagenUrl("http://localhost:8083/servicios/brushing-plancha.webp")
+                    .imagenUrl(imagesBaseUrl + "/servicios/brushing-plancha.webp")
                     .build()
             );
 
@@ -85,7 +88,7 @@ public class LoadToDatabase {
                     .descripcion("Coloración completa profesional.")
                     .precio(24990)
                     .categoria(coloracion)
-                    .imagenUrl("http://localhost:8083/servicios/color-completo.png")
+                    .imagenUrl(imagesBaseUrl + "/servicios/color-completo.png")
                     .build()
             );
 
@@ -94,7 +97,7 @@ public class LoadToDatabase {
                     .descripcion("Corte rápido de flequillo moderno.")
                     .precio(4990)
                     .categoria(cortes)
-                    .imagenUrl("http://localhost:8083/servicios/corte-flequillo.png")
+                    .imagenUrl(imagesBaseUrl + "/servicios/corte-flequillo.png")
                     .build()
             );
 
@@ -103,7 +106,7 @@ public class LoadToDatabase {
                     .descripcion("Corte masculino + perfilado.")
                     .precio(9990)
                     .categoria(cortes)
-                    .imagenUrl("http://localhost:8083/servicios/corte-hombre.jpg")
+                    .imagenUrl(imagesBaseUrl + "/servicios/corte-hombre.jpg")
                     .build()
             );
 
@@ -112,7 +115,7 @@ public class LoadToDatabase {
                     .descripcion("Corte profesional con asesoría de estilo.")
                     .precio(14990)
                     .categoria(cortes)
-                    .imagenUrl("http://localhost:8083/servicios/corte-mujer.jpg")
+                    .imagenUrl(imagesBaseUrl + "/servicios/corte-mujer.jpg")
                     .build()
             );
 
@@ -121,7 +124,7 @@ public class LoadToDatabase {
                     .descripcion("Corte infantil con estilo y rapidez.")
                     .precio(6990)
                     .categoria(cortes)
-                    .imagenUrl("http://localhost:8083/servicios/corte-nino.jpg")
+                    .imagenUrl(imagesBaseUrl + "/servicios/corte-nino.jpg")
                     .build()
             );
 
@@ -130,7 +133,7 @@ public class LoadToDatabase {
                     .descripcion("Retoque de raíces con tinte profesional.")
                     .precio(17990)
                     .categoria(coloracion)
-                    .imagenUrl("http://localhost:8083/servicios/crecimiento-tintura.jpg")
+                    .imagenUrl(imagesBaseUrl + "/servicios/crecimiento-tintura.jpg")
                     .build()
             );
 
@@ -139,7 +142,7 @@ public class LoadToDatabase {
                     .descripcion("Laminado profesional para cejas definidas.")
                     .precio(12990)
                     .categoria(manicure)
-                    .imagenUrl("http://localhost:8083/servicios/laminado-cejas.jpeg")
+                    .imagenUrl(imagesBaseUrl + "/servicios/laminado-cejas.jpeg")
                     .build()
             );
 
@@ -148,7 +151,7 @@ public class LoadToDatabase {
                     .descripcion("Lavado + masaje capilar hidratante.")
                     .precio(5990)
                     .categoria(tratamiento)
-                    .imagenUrl("http://localhost:8083/servicios/lavado-cabello.jpg")
+                    .imagenUrl(imagesBaseUrl + "/servicios/lavado-cabello.jpg")
                     .build()
             );
 
@@ -157,7 +160,7 @@ public class LoadToDatabase {
                     .descripcion("Lifting profesional para pestañas curvas y elevadas.")
                     .precio(14990)
                     .categoria(manicure)
-                    .imagenUrl("http://localhost:8083/servicios/lifting-pestanas.jpg")
+                    .imagenUrl(imagesBaseUrl + "/servicios/lifting-pestanas.jpg")
                     .build()
             );
 
@@ -166,7 +169,7 @@ public class LoadToDatabase {
                     .descripcion("Manicure rápida + limado + esmalte.")
                     .precio(7990)
                     .categoria(manicure)
-                    .imagenUrl("http://localhost:8083/servicios/manicure-express.jpg")
+                    .imagenUrl(imagesBaseUrl + "/servicios/manicure-express.jpg")
                     .build()
             );
 
@@ -175,7 +178,7 @@ public class LoadToDatabase {
                     .descripcion("Manicure para hombre con limpieza profunda.")
                     .precio(8990)
                     .categoria(manicure)
-                    .imagenUrl("http://localhost:8083/servicios/manicure-hombre.jpg")
+                    .imagenUrl(imagesBaseUrl + "/servicios/manicure-hombre.jpg")
                     .build()
             );
 
@@ -184,7 +187,7 @@ public class LoadToDatabase {
                     .descripcion("Manicure suave para niños.")
                     .precio(4990)
                     .categoria(manicure)
-                    .imagenUrl("http://localhost:8083/servicios/manicure-ninos.webp")
+                    .imagenUrl(imagesBaseUrl + "/servicios/manicure-ninos.webp")
                     .build()
             );
 
@@ -193,7 +196,7 @@ public class LoadToDatabase {
                     .descripcion("Manicure + pedicure completo.")
                     .precio(14990)
                     .categoria(manicure)
-                    .imagenUrl("http://localhost:8083/servicios/manicure-pedicure.jpg")
+                    .imagenUrl(imagesBaseUrl + "/servicios/manicure-pedicure.jpg")
                     .build()
             );
 
@@ -202,7 +205,7 @@ public class LoadToDatabase {
                     .descripcion("Limpieza + corte + esmaltado tradicional.")
                     .precio(9990)
                     .categoria(manicure)
-                    .imagenUrl("http://localhost:8083/servicios/manicure-tradicional.webp")
+                    .imagenUrl(imagesBaseUrl + "/servicios/manicure-tradicional.webp")
                     .build()
             );
 
@@ -211,7 +214,7 @@ public class LoadToDatabase {
                     .descripcion("Ondas definidas hechas con plancha.")
                     .precio(12990)
                     .categoria(peinados)
-                    .imagenUrl("http://localhost:8083/servicios/ondulado-plancha.jpg")
+                    .imagenUrl(imagesBaseUrl + "/servicios/ondulado-plancha.jpg")
                     .build()
             );
 
@@ -220,7 +223,7 @@ public class LoadToDatabase {
                     .descripcion("Perfilado profesional con pinza o cera.")
                     .precio(5990)
                     .categoria(manicure)
-                    .imagenUrl("http://localhost:8083/servicios/perfilado-cejas.jpg")
+                    .imagenUrl(imagesBaseUrl + "/servicios/perfilado-cejas.jpg")
                     .build()
             );
 
@@ -229,7 +232,7 @@ public class LoadToDatabase {
                     .descripcion("Reflejos suaves para iluminar tu cabello.")
                     .precio(19990)
                     .categoria(coloracion)
-                    .imagenUrl("http://localhost:8083/servicios/reflejos.jpg")
+                    .imagenUrl(imagesBaseUrl + "/servicios/reflejos.jpg")
                     .build()
             );
 
@@ -238,7 +241,7 @@ public class LoadToDatabase {
                     .descripcion("Restauración profunda de rizos naturales.")
                     .precio(19990)
                     .categoria(tratamiento)
-                    .imagenUrl("http://localhost:8083/servicios/restauracion-rizos.webp")
+                    .imagenUrl(imagesBaseUrl + "/servicios/restauracion-rizos.webp")
                     .build()
             );
 
@@ -247,7 +250,7 @@ public class LoadToDatabase {
                     .descripcion("Tinte especial para cejas naturales y definidas.")
                     .precio(6990)
                     .categoria(manicure)
-                    .imagenUrl("http://localhost:8083/servicios/tinte-cejas.jpg")
+                    .imagenUrl(imagesBaseUrl + "/servicios/tinte-cejas.jpg")
                     .build()
             );
 
@@ -256,7 +259,7 @@ public class LoadToDatabase {
                     .descripcion("Tratamientos nutritivos para todo tipo de cabello.")
                     .precio(17990)
                     .categoria(tratamiento)
-                    .imagenUrl("http://localhost:8083/servicios/tratamientos-capilares.jpg")
+                    .imagenUrl(imagesBaseUrl + "/servicios/tratamientos-capilares.jpg")
                     .build()
             );
 
@@ -265,7 +268,7 @@ public class LoadToDatabase {
                     .descripcion("Mechas con técnica tradicional usando papel aluminio.")
                     .precio(21990)
                     .categoria(coloracion)
-                    .imagenUrl("http://localhost:8083/servicios/visos-con-papel.webp")
+                    .imagenUrl(imagesBaseUrl + "/servicios/visos-con-papel.webp")
                     .build()
             );
 

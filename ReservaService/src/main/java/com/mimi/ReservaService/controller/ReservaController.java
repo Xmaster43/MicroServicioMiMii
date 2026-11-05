@@ -50,14 +50,10 @@ public class ReservaController {
             @ApiResponse(responseCode = "400", description = "Error en los datos enviados", content = @Content(mediaType = "application/json", examples = @ExampleObject(value = "\"Datos inválidos para crear la reserva\"")))
     })
     @PostMapping("/crear")
-    public ResponseEntity<?> crearReserva(
-            @RequestBody CrearReservaRequest req) {
-
-        ReservaResponse reserva = reservaService.crearReserva(req);
-        @SuppressWarnings("rawtypes")
-        ApiResponsess api = new ApiResponsess<ReservaResponse>(true, 200, reserva);
-
+    public ResponseEntity<?> crearReserva(@RequestBody CrearReservaRequest req) {
         try {
+            ReservaResponse reserva = reservaService.crearReserva(req);
+            ApiResponsess<ReservaResponse> api = new ApiResponsess<>(true, 201, reserva);
             return ResponseEntity.status(HttpStatus.CREATED).body(api);
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
