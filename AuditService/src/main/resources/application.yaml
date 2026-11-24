@@ -1,0 +1,54 @@
+server:
+  port: ${SERVER_PORT:8090}
+
+spring:
+  application:
+    name: AuditService
+
+  datasource:
+    url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:db_mimi_audit}?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+    username: ${DB_USER:root}
+    password: ${DB_PASSWORD:root}
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+
+    admin:
+      fail-fast: false
+      properties:
+        request.timeout.ms: 10000
+
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      acks: all
+      retries: 3
+      properties:
+        enable.idempotence: true
+
+    consumer:
+      group-id: audit-service-group
+      auto-offset-reset: earliest
+      enable-auto-commit: false
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
+      properties:
+        spring.deserializer.value.delegate.class: org.springframework.kafka.support.serializer.JsonDeserializer
+        spring.json.trusted.packages: "com.mimi.AuditService.dto"
+        spring.json.value.default.type: com.mimi.AuditService.dto.StreamEventDTO
+        spring.json.use.type.headers: false
+
+    listener:
+      ack-mode: record
+      concurrency: 2
+      missing-topics-fatal: false
+
+# Usado por KafkaTopicConfig (@Value("${kafka.topic.replication-factor:1}"))
+# Con un solo broker debe ser 1; con 2 o 3 brokers puedes subirlo.
+kafka:
+  topic:
+    replication-factor: ${KAFKA_REPLICATION_FACTOR:1}

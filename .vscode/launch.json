@@ -63,6 +63,16 @@
             "projectName": "ProductService",
             "args": "",
             "envFile": "${workspaceFolder}/.env"
+        },
+        {
+            "type": "java",
+            "name": "Spring Boot-AuditServiceApplication<AuditService>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "com.mimi.AuditService.AuditServiceApplication",
+            "projectName": "AuditService",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
         }
     ]
 }

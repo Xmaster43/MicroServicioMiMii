@@ -3,15 +3,17 @@ package com.mimi.AuthService.service;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import lombok.RequiredArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.Map;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClient;
 
 import com.mimi.AuthService.dto.LoginRequest;
 import com.mimi.AuthService.dto.LoginResponse;
+import com.mimi.AuthService.dto.StreamEventDTO;
 import com.mimi.AuthService.dto.UserAuthDTO;
 import com.mimi.AuthService.dto.UserDTO;
 import com.mimi.AuthService.security.JwtUtil;
@@ -22,8 +24,11 @@ import jakarta.servlet.http.HttpServletRequest;
 @RequiredArgsConstructor
 public class AuthService {
 
+    private static final String AUTH_TOPIC = "mimii.auth.eventos";
+
     private final RestClient restClient;
     private final JwtUtil jwtUtil;
+    private final KafkaEventProducer kafkaEventProducer;
 
     @Value("${userservice.url:http://localhost:8084}")
     private String userServiceUrl;
@@ -50,6 +55,19 @@ public class AuthService {
                 usuario.getCorreo(),
                 usuario.getRolId());
 
+        kafkaEventProducer.publicar(
+                AUTH_TOPIC,
+                usuario.getCorreo(),
+                StreamEventDTO.builder()
+                        .eventId(UUID.randomUUID().toString())
+                        .sourceService("AuthService")
+                        .eventType("USER_LOGIN")
+                        .entityId(usuario.getCorreo())
+                        .payload("{\"correo\":\"" + usuario.getCorreo() + "\",\"rolId\":" + usuario.getRolId() + "}")
+                        .timestamp(LocalDateTime.now())
+                        .build()
+        );
+
         return new LoginResponse(
                 true,
                 "Login exitoso",
@@ -66,7 +84,6 @@ public class AuthService {
     }
 
     public Object me(HttpServletRequest request) {
-
         String authHeader = request.getHeader("Authorization");
 
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
@@ -77,7 +94,6 @@ public class AuthService {
 
         try {
             String email = jwtUtil.extractEmail(token);
-
             String url = userServiceUrl + "/api/users/by-email/" + email;
 
             UserDTO usuario = restClient.get()
@@ -90,10 +106,8 @@ public class AuthService {
             }
 
             return usuario;
-
         } catch (Exception e) {
             return Map.of("error", "Token inválido o expirado");
         }
     }
-
 }
