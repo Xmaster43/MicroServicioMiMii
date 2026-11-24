@@ -10,7 +10,7 @@ import com.mimi.UserService.model.User;
 import com.mimi.UserService.repository.RoleRepository;
 import com.mimi.UserService.repository.UserRepository;
 
-import lombok.RequiredArgsConstructor;
+import lombok.RequiredArgsConstructor;  
 
 @Configuration
 @RequiredArgsConstructor
