@@ -22,7 +22,8 @@ public class CorsConfig {
                 registry.addMapping("/**")
                         .allowedOrigins(Arrays.stream(corsOrigins.split(","))
                                 .map(String::trim)
-                                .toArray(String[]::new))
+                                .toArray(String[]::new)
+                            )
                         .allowedMethods("GET", "POST", "PUT", "DELETE")
                         .allowedHeaders("*")
                         .allowCredentials(false);
